@@ -1,0 +1,520 @@
+/* ui.css — Grand Buffer Auto shell UI */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #05030d;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+
+/* ── iframe fills everything ── */
+#gameFrame {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  border: none; display: block;
+  z-index: 0;
+}
+
+/* ── all overlay layers sit above the iframe ── */
+#titleScreen, #settingsPanel, #mobileUI,
+#fpsCounter, #fade {
+  position: fixed;
+  z-index: 10;
+}
+
+.hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════
+   FADE
+═══════════════════════════════════════════ */
+#fade {
+  inset: 0;
+  background: #000;
+  opacity: 1;
+  transition: opacity 1.8s ease;
+  pointer-events: none;
+  z-index: 100;
+}
+#fade.clear { opacity: 0; }
+
+/* ═══════════════════════════════════════════
+   TITLE SCREEN
+═══════════════════════════════════════════ */
+#titleScreen {
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 110% 80% at 50% 115%,
+      rgba(6,2,18,.95) 0%, rgba(6,2,18,.5) 40%, transparent 72%),
+    linear-gradient(180deg,
+      rgba(8,3,22,.7) 0%, transparent 28%,
+      transparent 62%, rgba(4,2,14,.85) 100%);
+  transition: opacity 1.5s ease;
+  pointer-events: all;
+  cursor: pointer;
+  z-index: 20;
+}
+#titleScreen.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#titleInner { text-align: center; padding: 0 24px; }
+
+#titleAuthor {
+  font-size: clamp(9px, 1.8vw, 13px);
+  font-weight: 600;
+  letter-spacing: .55em;
+  color: rgba(255,200,150,.4);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+#titleName {
+  font-size: clamp(56px, 10.5vw, 148px);
+  font-weight: 900;
+  letter-spacing: .1em;
+  line-height: .9;
+  margin: 0 0 20px 0;
+  background: linear-gradient(
+    180deg,
+    #fff8ec 0%,
+    #ffd9a0 22%,
+    #ff9e6e 42%,
+    #ff5f9e 62%,
+    #b86bff 86%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 0 20px rgba(255,110,160,.6))
+    drop-shadow(0 0 64px rgba(150,80,255,.38));
+  animation: tGlow 4s ease-in-out infinite;
+}
+@keyframes tGlow {
+  0%,100% {
+    filter:
+      drop-shadow(0 0 20px rgba(255,110,160,.6))
+      drop-shadow(0 0 64px rgba(150,80,255,.38));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 32px rgba(255,140,180,.9))
+      drop-shadow(0 0 90px rgba(175,100,255,.55));
+  }
+}
+
+#titleRule {
+  width: min(440px, 58vw);
+  height: 2px;
+  margin: 0 auto 20px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,170,120,.95),
+    rgba(255,95,158,.95),
+    rgba(184,107,255,.95),
+    transparent);
+  box-shadow: 0 0 16px rgba(255,120,170,.75);
+}
+
+#titleTagline {
+  font-size: clamp(9px, 1.6vw, 12px);
+  letter-spacing: .45em;
+  color: rgba(255,210,170,.35);
+  margin-bottom: 26px;
+  text-transform: uppercase;
+}
+
+#titleStart {
+  font-size: clamp(11px, 2vw, 15px);
+  font-weight: 700;
+  letter-spacing: .5em;
+  color: #ffe9d6;
+  text-shadow:
+    0 0 14px rgba(255,180,130,.85),
+    0 0 32px rgba(255,120,170,.5);
+  animation: pulse 2.1s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.95} 50%{opacity:.22} }
+
+#titleVersion {
+  font-size: 10px;
+  color: rgba(255,200,150,.18);
+  letter-spacing: .2em;
+  margin-top: 38px;
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS PANEL
+═══════════════════════════════════════════ */
+#settingsPanel {
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3,2,10,.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: all;
+  z-index: 50;
+}
+
+#settingsBox {
+  width: min(540px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(10,6,26,.97);
+  border: 1px solid rgba(255,120,170,.14);
+  border-radius: 18px;
+  padding: 0 0 24px 0;
+  position: relative;
+  box-shadow:
+    0 0 80px rgba(180,90,255,.1),
+    0 0 160px rgba(255,80,160,.06),
+    inset 0 1px 0 rgba(255,200,160,.06);
+}
+#settingsBox::-webkit-scrollbar { width: 4px; }
+#settingsBox::-webkit-scrollbar-track { background: transparent; }
+#settingsBox::-webkit-scrollbar-thumb {
+  background: rgba(255,120,170,.25);
+  border-radius: 2px;
+}
+
+#settingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 24px 20px;
+  position: sticky;
+  top: 0;
+  background: rgba(10,6,26,.98);
+  border-bottom: 1px solid rgba(255,120,170,.08);
+  border-radius: 18px 18px 0 0;
+  z-index: 2;
+}
+
+#settingsTitle {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: .3em;
+  background: linear-gradient(90deg, #ff9e6e, #ff5f9e, #b86bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#settingsClose {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255,180,150,.45);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: color .18s, background .18s;
+  pointer-events: all;
+}
+#settingsClose:hover {
+  color: #ff5f9e;
+  background: rgba(255,95,158,.08);
+}
+
+.sSection {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .4em;
+  color: rgba(255,170,130,.35);
+  text-transform: uppercase;
+  padding: 18px 26px 8px;
+  border-bottom: 1px solid rgba(255,120,170,.07);
+}
+
+.sRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 26px;
+  gap: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.025);
+  transition: background .12s;
+}
+.sRow:last-of-type { border-bottom: none; }
+.sRow:hover { background: rgba(255,255,255,.015); }
+
+.sLabel {
+  font-size: 13px;
+  color: rgba(255,238,220,.7);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 190px;
+}
+.sValLabel {
+  color: rgba(255,200,160,.9);
+  font-weight: 700;
+}
+
+/* sliders */
+.sSlider {
+  flex: 1;
+  min-width: 80px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,120,170,.18);
+  outline: none;
+  cursor: pointer;
+}
+.sSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9e6e, #ff5f9e);
+  box-shadow: 0 0 8px rgba(255,100,160,.65);
+  cursor: pointer;
+  transition: transform .1s;
+}
+.sSlider::-webkit-slider-thumb:active { transform: scale(1.25); }
+.sSlider::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, #ff9e6e, #ff5f9e);
+  cursor: pointer;
+}
+
+/* button groups */
+.sBtnGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.sBtn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,120,170,.18);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,230,210,.45);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .15s;
+  pointer-events: all;
+}
+.sBtn:hover {
+  border-color: rgba(255,100,160,.45);
+  color: rgba(255,240,225,.8);
+  background: rgba(255,100,160,.06);
+}
+.sBtn.active {
+  border-color: rgba(255,100,160,.7);
+  background: linear-gradient(135deg, rgba(255,100,130,.22), rgba(180,90,255,.22));
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255,80,140,.18);
+}
+
+/* toggles */
+.sToggle {
+  min-width: 52px;
+  padding: 5px 13px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,120,170,.18);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,200,180,.4);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  cursor: pointer;
+  text-align: center;
+  transition: all .18s;
+  pointer-events: all;
+}
+.sToggle[data-on="true"] {
+  border-color: rgba(255,100,160,.65);
+  background: linear-gradient(135deg, rgba(255,100,130,.25), rgba(180,90,255,.25));
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255,80,140,.18);
+}
+
+#settingsFooter {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: .22em;
+  color: rgba(255,180,140,.18);
+  text-transform: uppercase;
+  padding: 20px 24px 0;
+}
+
+/* ═══════════════════════════════════════════
+   FPS COUNTER
+═══════════════════════════════════════════ */
+#fpsCounter {
+  top: 12px;
+  left: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #7fff90;
+  text-shadow: 0 0 8px rgba(80,255,120,.55);
+  letter-spacing: .06em;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE CONTROLS
+═══════════════════════════════════════════ */
+#mobileUI {
+  inset: 0;
+  pointer-events: none;
+}
+
+/* joystick */
+#joystickZone {
+  position: absolute;
+  left: 18px;
+  bottom: 180px;
+  pointer-events: all;
+}
+#joystickBase {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,180,140,.2);
+  box-shadow: 0 0 18px rgba(255,120,160,.08);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#joystickKnob {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,200,150,.9), rgba(255,80,140,.55));
+  box-shadow: 0 0 16px rgba(255,110,150,.45);
+  position: absolute;
+  pointer-events: none;
+  transition: box-shadow .1s;
+}
+
+/* action buttons (right side) */
+#actionButtons {
+  position: absolute;
+  right: 14px;
+  bottom: 110px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  pointer-events: none;
+}
+
+/* drive gas/brake (bottom right) */
+#driveButtons {
+  position: absolute;
+  right: 130px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* look zone */
+#lookZone {
+  position: absolute;
+  left: 150px;
+  right: 190px;
+  top: 0;
+  bottom: 180px;
+  pointer-events: all;
+}
+
+/* weapon bar */
+#weaponBar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 22px;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+.wBtn {
+  pointer-events: all;
+  width: 50px; height: 50px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,180,140,.22);
+  background: rgba(255,255,255,.06);
+  color: white;
+  font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .1s, border-color .1s;
+}
+.wBtn.active {
+  border-color: rgba(255,100,160,.7);
+  background: rgba(255,100,160,.18);
+  box-shadow: 0 0 12px rgba(255,80,140,.25);
+}
+.wBtn:active { transform: scale(.88); }
+
+/* mobile buttons */
+.mBtn {
+  pointer-events: all;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,180,140,.25);
+  background: rgba(255,255,255,.07);
+  color: white;
+  font-size: 21px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .1s, transform .08s;
+}
+.mBtn:active {
+  background: rgba(255,110,150,.28);
+  transform: scale(.88);
+}
+.dBtn {
+  width: 62px; height: 62px;
+  font-size: 24px;
+}
+#mFire {
+  background: rgba(255,40,60,.12);
+  border-color: rgba(255,60,80,.45);
+}
+#mFire:active { background: rgba(255,40,60,.38); }
+#mAim {
+  background: rgba(80,200,255,.08);
+  border-color: rgba(80,200,255,.35);
+}
+#mGas {
+  background: rgba(80,255,120,.1);
+  border-color: rgba(80,255,120,.35);
+}
+#mBrake {
+  background: rgba(255,80,60,.1);
+  border-color: rgba(255,80,60,.35);
+}
+
+/* landscape tweaks */
+@media (max-height: 480px) {
+  #joystickBase { width: 84px; height: 84px; }
+  #joystickKnob { width: 34px; height: 34px; }
+  .mBtn { width: 46px; height: 46px; font-size: 18px; }
+  .dBtn { width: 52px; height: 52px; }
+  #joystickZone { bottom: 120px; }
+  #actionButtons { bottom: 70px; }
+  #driveButtons { bottom: 18px; }
+}
