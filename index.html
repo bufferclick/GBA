@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Grand Buffer Auto</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="ui">
+  <div id="stars">
+    <svg viewBox="0 0 24 24"><path class="st" d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 6.9L12 17.6 5.7 20.9 7 14 1.9 9.1l7-.9z"/></svg>
+    <svg viewBox="0 0 24 24"><path class="st" d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 6.9L12 17.6 5.7 20.9 7 14 1.9 9.1l7-.9z"/></svg>
+    <svg viewBox="0 0 24 24"><path class="st" d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 6.9L12 17.6 5.7 20.9 7 14 1.9 9.1l7-.9z"/></svg>
+    <svg viewBox="0 0 24 24"><path class="st" d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 6.9L12 17.6 5.7 20.9 7 14 1.9 9.1l7-.9z"/></svg>
+    <svg viewBox="0 0 24 24"><path class="st" d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 6.9L12 17.6 5.7 20.9 7 14 1.9 9.1l7-.9z"/></svg>
+  </div>
+  <div id="mapWrap"><canvas id="map" width="424" height="424"></canvas></div>
+  <div id="ammo">
+    <svg id="ammoIcon" viewBox="0 0 46 26"><path d="M6 9 h26 v6 h-7 l-1.5 7 h-7 l1.5 -7 h-6 a4 4 0 0 1 -4 -4 z M32 9 h8 v4 h-8 z"/></svg>
+    <div id="ammoNum"><span id="ammoClip">12</span><small id="ammoRes">∞</small></div>
+  </div>
+  <div id="cross" style="--g:3px">
+    <div class="d"></div>
+    <div class="t tN"></div>
+    <div class="t tS"></div>
+    <div class="t tW"></div>
+    <div class="t tE"></div>
+  </div>
+  <!-- mobile controls -->
+  <div id="mobileControls">
+    <div id="joystickWrap"><div id="joystick"><div id="joystickKnob"></div></div></div>
+    <div id="mobileRight">
+      <button class="mBtn" id="btnFire">🔫</button>
+      <button class="mBtn" id="btnAim">🎯</button>
+      <button class="mBtn" id="btnJump">⬆</button>
+      <button class="mBtn" id="btnEnter">🚗</button>
+      <button class="mBtn" id="btnHandbrake">⚡</button>
+      <button class="mBtn" id="btnSettings" id="btnSettingsMobile">⚙</button>
+    </div>
+    <div id="mobileGas">
+      <button class="mBtn big" id="btnGas">▲</button>
+      <button class="mBtn big" id="btnBrake">▼</button>
+    </div>
+    <div id="mobileLook" title="drag to look"></div>
+  </div>
+</div>
+
+<!-- title card -->
+<div id="titleCard" class="ui"><span>GRAND BUFFER AUTO</span></div>
+
+<!-- title screen -->
+<div id="titleScreen" class="ui">
+  <div id="titleTop">
+    <div id="titleAuthor">BufferClick</div>
+    <h1 id="titleName">GRAND<br>BUFFER<br>AUTO</h1>
+    <div id="titleRule"></div>
+    <div id="titleStart" id="startPrompt">TAP TO START</div>
+  </div>
+</div>
+
+<!-- settings panel -->
+<div id="settingsPanel" class="ui hidden">
+  <div id="settingsBox">
+    <div id="settingsTitle">SETTINGS</div>
+    <div class="settingsClose" id="settingsClose">✕</div>
+
+    <div class="sSection">GRAPHICS</div>
+    <div class="sRow">
+      <span class="sLabel">Quality</span>
+      <div class="sButtonGroup" id="gfxGroup">
+        <button class="sBtn active" data-val="0">Potato</button>
+        <button class="sBtn" data-val="1">Low</button>
+        <button class="sBtn" data-val="2">Medium</button>
+        <button class="sBtn" data-val="3">High</button>
+        <button class="sBtn" data-val="4">Ultra</button>
+      </div>
+    </div>
+
+    <div class="sSection">CAMERA</div>
+    <div class="sRow">
+      <span class="sLabel">FOV <span id="fovVal">62</span>°</span>
+      <input type="range" id="fovSlider" min="45" max="110" value="62" class="sSlider">
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Mouse Sensitivity <span id="sensVal">5</span></span>
+      <input type="range" id="sensSlider" min="1" max="10" value="5" class="sSlider">
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Camera Shake</span>
+      <div class="sToggle" id="shakeToggle" data-on="true">ON</div>
+    </div>
+
+    <div class="sSection">AUDIO</div>
+    <div class="sRow">
+      <span class="sLabel">Master Volume <span id="volVal">80</span></span>
+      <input type="range" id="volSlider" min="0" max="100" value="80" class="sSlider">
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Music Volume <span id="musicVolVal">50</span></span>
+      <input type="range" id="musicVolSlider" min="0" max="100" value="50" class="sSlider">
+    </div>
+    <div class="sRow">
+      <span class="sLabel">SFX Volume <span id="sfxVolVal">90</span></span>
+      <input type="range" id="sfxVolSlider" min="0" max="100" value="90" class="sSlider">
+    </div>
+
+    <div class="sSection">CONTROLS</div>
+    <div class="sRow">
+      <span class="sLabel">Invert Y</span>
+      <div class="sToggle" id="invertYToggle" data-on="false">OFF</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Mobile Joystick Size <span id="joyVal">100</span></span>
+      <input type="range" id="joySlider" min="60" max="160" value="100" class="sSlider">
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Button Opacity <span id="btnOpacVal">80</span></span>
+      <input type="range" id="btnOpacSlider" min="20" max="100" value="80" class="sSlider">
+    </div>
+
+    <div class="sSection">DISPLAY</div>
+    <div class="sRow">
+      <span class="sLabel">Bloom</span>
+      <div class="sToggle" id="bloomToggle" data-on="true">ON</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Motion Blur</span>
+      <div class="sToggle" id="motionBlurToggle" data-on="false">OFF</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Show FPS</span>
+      <div class="sToggle" id="fpsToggle" data-on="false">OFF</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Crosshair</span>
+      <div class="sToggle" id="crosshairToggle" data-on="true">ON</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Minimap</span>
+      <div class="sToggle" id="minimapToggle" data-on="true">ON</div>
+    </div>
+
+    <div class="sSection">PERFORMANCE</div>
+    <div class="sRow">
+      <span class="sLabel">Auto Quality</span>
+      <div class="sToggle" id="autoQualToggle" data-on="true">ON</div>
+    </div>
+    <div class="sRow">
+      <span class="sLabel">Shadow Distance <span id="shadowVal">3</span></span>
+      <input type="range" id="shadowSlider" min="1" max="5" value="3" class="sSlider">
+    </div>
+
+    <div id="settingsFooter">Grand Buffer Auto — BufferClick</div>
+  </div>
+</div>
+
+<!-- fps counter -->
+<div id="fpsCounter" class="hidden">FPS: --</div>
+
+<!-- fade -->
+<div id="fade" class="ui clear"></div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
